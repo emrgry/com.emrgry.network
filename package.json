@@ -1,0 +1,17 @@
+{
+  "name": "com.emrgry.network",
+  "version": "1.0.0",
+  "displayName": "Emrgry Network",
+  "description": "NGO-based multiplayer infrastructure: Relay connection, session management, networked scene loading, player spawning, and network sync. Depends on com.emrgry.core.",
+  "unity": "6000.0",
+  "author": {
+    "name": "emrgry",
+    "url": "https://github.com/emrgry"
+  },
+  "dependencies": {
+    "com.emrgry.core": "1.0.0",
+    "com.cysharp.unitask": "2.5.10",
+    "com.unity.netcode.gameobjects": "2.0.0",
+    "com.unity.services.multiplayer": "2.0.0"
+  }
+}
