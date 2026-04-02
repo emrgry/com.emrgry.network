@@ -9,8 +9,6 @@
     "url": "https://github.com/emrgry"
   },
   "dependencies": {
-    "com.emrgry.core": "1.0.0",
-    "com.cysharp.unitask": "2.5.10",
     "com.unity.netcode.gameobjects": "2.0.0",
     "com.unity.services.multiplayer": "2.0.0"
   }
