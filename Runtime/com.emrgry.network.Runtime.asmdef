@@ -6,9 +6,11 @@
         "UniTask",
         "Unity.Netcode.Runtime",
         "Unity.Networking.Transport",
+        "Unity.Collections",
         "Unity.Services.Relay",
         "Unity.Services.Authentication",
-        "Unity.Services.Core"
+        "Unity.Services.Core",
+        "Unity.Services.Multiplayer"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
