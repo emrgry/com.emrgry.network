@@ -1,6 +1,6 @@
 {
   "name": "com.emrgry.network",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "displayName": "Emrgry Network",
   "description": "NGO-based multiplayer infrastructure: drop-in NetworkBootstrap, Relay connection, session management, networked scene loading, owner-authoritative spawn, and a stock player NetworkBehaviour. Designed for package-only multiplayer integration.",
   "unity": "6000.0",
