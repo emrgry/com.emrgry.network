@@ -1,15 +1,24 @@
 {
   "name": "com.emrgry.network",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "displayName": "Emrgry Network",
-  "description": "NGO-based multiplayer infrastructure: Relay connection, session management, networked scene loading, player spawning, and network sync. Depends on com.emrgry.core.",
+  "description": "NGO-based multiplayer infrastructure: drop-in NetworkBootstrap, Relay connection, session management, networked scene loading, owner-authoritative spawn, and a stock player NetworkBehaviour. Designed for package-only multiplayer integration.",
   "unity": "6000.0",
   "author": {
     "name": "emrgry",
     "url": "https://github.com/emrgry"
   },
   "dependencies": {
+    "com.emrgry.core": "1.1.0",
+    "com.cysharp.unitask": "2.5.10",
     "com.unity.netcode.gameobjects": "2.0.0",
     "com.unity.services.multiplayer": "2.0.0"
-  }
+  },
+  "samples": [
+    {
+      "displayName": "Player Actions Interface",
+      "description": "Starter IPlayerNetworkActions interface that decouples gameplay-layer input from network-layer RPCs.",
+      "path": "Samples~/PlayerActions"
+    }
+  ]
 }

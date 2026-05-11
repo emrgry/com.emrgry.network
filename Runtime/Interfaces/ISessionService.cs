@@ -18,6 +18,8 @@ namespace Emrgry.Network
         SessionPhase Phase { get; }
         IReadOnlyList<PlayerSlotData> PlayerSlots { get; }
         int MaxPlayers { get; }
+        int MinPlayersToStart { get; }
+        string GameSceneName { get; }
         bool IsEveryoneReady { get; }
 
         void SetLocalPlayerReady(bool ready);

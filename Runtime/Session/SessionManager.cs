@@ -1,15 +1,31 @@
 using System;
 using System.Collections.Generic;
 using Emrgry.Core;
+using Emrgry.Network.Bootstrap;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
 namespace Emrgry.Network.Session
 {
+    /// <summary>
+    /// Server-authoritative session manager. Tracks player slots (display name,
+    /// ready flag, host flag), broadcasts <see cref="SessionPhase"/> changes, and
+    /// loads the game scene when the host calls <see cref="StartGame"/>.
+    ///
+    /// <para>Configuration sources, in priority order:</para>
+    /// <list type="number">
+    /// <item><description><see cref="NetworkConfigData"/> on the active
+    /// <see cref="NetworkBootstrap"/> (preferred).</description></item>
+    /// <item><description>The serialized fallback fields on this component
+    /// (<c>_maxPlayers</c>, <c>_minPlayersToStart</c>, <c>_gameSceneName</c>).</description></item>
+    /// </list>
+    /// </summary>
     public sealed class SessionManager : NetworkBehaviour, ISessionService
     {
+        [Header("Fallback values when no NetworkConfigData is found")]
         [SerializeField] private int _maxPlayers = 4;
+        [SerializeField] private int _minPlayersToStart = 2;
         [SerializeField] private string _gameSceneName = "GameScene";
 
         private NetworkList<NetworkPlayerSlot> _playerSlots;
@@ -21,10 +37,14 @@ namespace Emrgry.Network.Session
 
         private readonly List<PlayerSlotData> _cachedSlots = new();
         private IEventBus _eventBus;
+        private NetworkConfigData _config;
 
         public SessionPhase Phase => _phase.Value;
         public IReadOnlyList<PlayerSlotData> PlayerSlots => _cachedSlots;
-        public int MaxPlayers => _maxPlayers;
+        public int MaxPlayers => _config != null ? _config.MaxPlayers : _maxPlayers;
+        public int MinPlayersToStart => _config != null ? _config.MinPlayersToStart : _minPlayersToStart;
+        public string GameSceneName =>
+            _config != null && !string.IsNullOrEmpty(_config.GameSceneName) ? _config.GameSceneName : _gameSceneName;
 
         public bool IsEveryoneReady
         {
@@ -37,7 +57,7 @@ namespace Emrgry.Network.Session
                     occupiedCount++;
                     if (!_playerSlots[i].IsReady) return false;
                 }
-                return occupiedCount >= 2;
+                return occupiedCount >= MinPlayersToStart;
             }
         }
 
@@ -54,6 +74,10 @@ namespace Emrgry.Network.Session
         {
             if (_eventBus == null && ServiceLocator.TryResolve<IEventBus>(out var bus))
                 _eventBus = bus;
+
+            // Pick up the bootstrap config if one exists in the scene.
+            var bootstrap = FindFirstObjectByType<NetworkBootstrap>();
+            if (bootstrap != null) _config = bootstrap.Config;
 
             _phase.OnValueChanged += OnPhaseChanged;
             _playerSlots.OnListChanged += OnPlayerSlotsChanged;
@@ -126,14 +150,22 @@ namespace Emrgry.Network.Session
             if (!IsServer) return;
             if (!IsEveryoneReady)
             {
-                Debug.LogWarning("[SessionManager] Cannot start game — not everyone is ready.");
+                Debug.LogWarning($"[SessionManager] Cannot start — IsEveryoneReady false. " +
+                                 $"(MinPlayersToStart={MinPlayersToStart})");
                 return;
             }
 
             _phase.Value = SessionPhase.Loading;
 
+            var sceneName = GameSceneName;
+            if (string.IsNullOrEmpty(sceneName))
+            {
+                Debug.LogError("[SessionManager] GameSceneName is empty. Configure it on NetworkConfigData or the fallback field.");
+                return;
+            }
+
             if (ServiceLocator.TryResolve<INetworkSceneService>(out var sceneService))
-                sceneService.LoadScene(_gameSceneName);
+                sceneService.LoadScene(sceneName);
         }
 
         private void OnServerClientConnected(ulong clientId)
